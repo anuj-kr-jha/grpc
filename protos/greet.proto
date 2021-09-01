@@ -16,6 +16,5 @@ message GreetResponse {
 }
 
 service GreetService {
-    //unary API
     rpc Greet (GreetRequest) returns (GreetResponse);
 }  

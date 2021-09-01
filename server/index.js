@@ -4,8 +4,24 @@ const service = require('../server/protos/calculator_grpc_pb');
 
 function calculate(call, callback) {
   const calculationResponse = new calculator.CalculationResponse();
-  
-  calculationResponse.setResult(11);
+  let result;
+  switch(call.request.getOp()) {
+    case '+':
+      result = call.request.getNum1() + call.request.getNum2()
+      break;
+    case '-':
+      result = call.request.getNum1() - call.request.getNum2()
+      break;
+    case '*':
+      result = call.request.getNum1() * call.request.getNum2()
+      break;
+    case '/':
+      result = call.request.getNum1() / call.request.getNum2()
+      break;
+    default:
+      result = -1;
+  }
+  calculationResponse.setResult(result);
   callback(null, calculationResponse);
 }
 

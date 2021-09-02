@@ -1,9 +1,8 @@
-const path = require('path');
 const grpc = require('grpc');
 const protoLoader = require('@grpc/proto-loader');
 
-const greetProtoPath = path.join(__dirname, '..', 'protos', 'greet.proto');
-const greetProtoDefination = protoLoader.loadSync(greetProtoPath, {});
+const PROTO_PATH = require('path').join(__dirname, '..', 'protos', 'greet.proto');
+const greetProtoDefination = protoLoader.loadSync(PROTO_PATH, {});
 
 const greetPackageDefination = grpc.loadPackageDefinition(greetProtoDefination).greet; 
 

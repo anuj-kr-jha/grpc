@@ -1,38 +1,34 @@
+const path = require('path');
 const grpc = require('grpc');
-const calculator = require('../server/protos/calculator_pb');
-const service = require('../server/protos/calculator_grpc_pb');
+const protoLoader = require('@grpc/proto-loader');
 
-function calculate(call, callback) {
-  const calculationResponse = new calculator.CalculationResponse();
-  let result;
-  switch(call.request.getOp()) {
-    case '+':
-      result = call.request.getNum1() + call.request.getNum2()
-      break;
-    case '-':
-      result = call.request.getNum1() - call.request.getNum2()
-      break;
-    case '*':
-      result = call.request.getNum1() * call.request.getNum2()
-      break;
-    case '/':
-      result = call.request.getNum1() / call.request.getNum2()
-      break;
-    default:
-      result = -1;
-  }
-  calculationResponse.setResult(result);
-  callback(null, calculationResponse);
+const greetProtoPath = path.join(__dirname, '..', 'protos', 'greet.proto');
+const greetProtoDefination = protoLoader.loadSync(greetProtoPath, {});
+
+const greetPackageDefination = grpc.loadPackageDefinition(greetProtoDefination).greet; 
+
+function greet(call, callback){
+    const greetResponse = {result: `hello ${call.request.greeting.firstName} ${call.request.greeting.lastName}`}
+    callback(null, greetResponse);
+} 
+function main(){
+    const server = new grpc.Server();
+    server.addService(greetPackageDefination.GreetService.service, {
+        greet: greet
+    })
+    server.bind("127.0.0.1:4000", grpc.ServerCredentials.createInsecure());
+    server.start();
+    console.log({server: 'running @127.0.0.1:4000'})
 }
+main()
 
-function main() {
-  const server = new grpc.Server();
-  server.addService(service.CalculatorServiceService, {
-    calculate: calculate,
-  });
-  server.bind('127.0.0.1:4000', grpc.ServerCredentials.createInsecure());
-  server.start();
-  console.log('server is running on 127.0.0.1:4000');
-}
-
-main();
+/**
+ * ! loadSync optional params::
+ * protoLoader.loadSync('', {
+ *    keepCase: true,
+ *    longs: String,
+ *    enums: true,
+ *    defaults: true,
+ *    oneofs: true,
+ * })
+ */

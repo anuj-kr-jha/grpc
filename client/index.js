@@ -1,25 +1,15 @@
-const grpc = require('grpc');
+const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 
-const PROTO_PATH = require('path').join(__dirname, '..', 'protos', 'greet.proto');
-const greetProtoDefination = protoLoader.loadSync(PROTO_PATH, {});
-const greetPackageDefination = grpc.loadPackageDefinition(greetProtoDefination).greet; 
+const PROTO_PATH = require('path').join(__dirname, '..', 'protos', 'primeNumberDecomposition.proto');
+const primeNumberDecompositionProtoDefination = protoLoader.loadSync(PROTO_PATH, {});
+const primeNumberDecompositionPackageDefination = grpc.loadPackageDefinition(primeNumberDecompositionProtoDefination).primeNumberDecomposition; 
   
-const client = new greetPackageDefination.GreetService('localhost:4000', grpc.credentials.createInsecure());
+const client = new primeNumberDecompositionPackageDefination.DecomposePrimeService('localhost:4000', grpc.credentials.createInsecure());
 
-function callGreet(){
-    const greetRequest = { greeting: {firstName: "Anuj", lastName: "Jha"}}
-    client.greet(greetRequest, (error, response)=>{
-        if (error) return console.log({error});
-        console.log({result: response.result})
-    })
-}
-
-function callGreetManyTimes() {
-    const greetManyTimesRequest = { greeting: {firstName: "Anuj", lastName: "Jha"}}
-    const call = client.greetManyTimes(greetManyTimesRequest, () => {}); // ? store function call on a variable
-
-    // ? listen to all events on that variable
+function callDecomposePrime() {
+    const decomposePrimeRequest = { number: process.argv[2] || 0 }
+    const call = client.decomposePrime(decomposePrimeRequest, () => {});
     call.on("data", (response) => {
       console.log({ result: response.result});
     });
@@ -33,8 +23,7 @@ function callGreetManyTimes() {
 }
 
 function main(){
-    // callGreet(); // unary api
-    callGreetManyTimes(); // server streaming api
+    callDecomposePrime(); // server streaming api
 }
 
 main(); 

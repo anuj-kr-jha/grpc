@@ -1,43 +1,40 @@
-const grpc = require('grpc');
+const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 
-const PROTO_PATH = require('path').join(__dirname, '..', 'protos', 'greet.proto');
-const greetProtoDefination = protoLoader.loadSync(PROTO_PATH, {});
+const PROTO_PATH = require('path').join(__dirname, '..', 'protos', 'primeNumberDecomposition.proto');
 
-const greetPackageDefination = grpc.loadPackageDefinition(greetProtoDefination).greet; 
+const primeNumberDecompositionProtoDefination = protoLoader.loadSync(PROTO_PATH, {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true
+});
 
-function greet(call, callback){
-    const greetResponse = {result: `hello ${call.request.greeting.firstName} ${call.request.greeting.lastName}`}
-    callback(null, greetResponse);
-} 
+const primeNumberDecompositionPackageDefination = grpc.loadPackageDefinition(primeNumberDecompositionProtoDefination).primeNumberDecomposition; 
 
-function greetManyTimes(call, callback){
-    let count = 0, intervalId = setInterval(()=>{
-      const greetManyTimesResponse = {result: `hello ${call.request.greeting.firstName} ${call.request.greeting.lastName}`}
-      call.write(greetManyTimesResponse);
-      
-      if(++count > 9) {
-        clearInterval(intervalId);
-        call.end();
-      }
-      // callback(null, greetManyTimeResponse);
-    }, 1000) 
+
+function decomposePrime(call, callback){
+  let k = 2, N = call.request.number;
+  while (N > 1){
+    if(N % k === 0){
+      call.write({ result: k });
+      N = N / k;
+    }
+    else
+      k++;
+  }  
+  call.end();
 } 
 
 function main(){
-    const server = new grpc.Server();
-    server.addService(greetPackageDefination.GreetService.service, {
-        greet: greet,
-        greetManyTimes: greetManyTimes
-    })
-    server.bind("127.0.0.1:4000", grpc.ServerCredentials.createInsecure());
+  const server = new grpc.Server();
+  server.addService(primeNumberDecompositionPackageDefination.DecomposePrimeService.service, {
+    decomposePrime: decomposePrime,
+  })
+  server.bindAsync("127.0.0.1:4000", grpc.ServerCredentials.createInsecure(), ()=>{
     server.start();
     console.log({server: 'running @127.0.0.1:4000'})
+  });
 }
 main()
-
-/**
- * * In streaming we dont need to call "callback(null, response);"
- * * instead we keep writing on "call" by "call.write(xyz)"
- * * and when done we "end" it by "call.end()"
- */

@@ -1,48 +1,9 @@
 mkdir client proto server
 npm init -y
 
-proto >  greet.proto
+proto >  primeNumberDecomposition.proto
 
-npm i grpc @grpc/proto-loader
-
-################################protofile.proto################################
-message Greet{
-    string firstName = 1;
-    string lastName = 2;
-}
-
-message GreetRequest{
-    Greet greeting = 1;
-}
-
-message GreetResponse{
-    string result = 1;
-}
-
-service GreetService{
-    rpc Greet (GreetRequest) returns (GretResponse);
-}
-###############################################################################
-Example for setting:
-  greetRequest
-      dynamic way
-        const greetRequest = { greeting: {firstName: "Anuj", lastName: "Jha"}}
-      static way
-        const greets = require('../server/protos/greet_pb');
-
-        const greetRequest = new greets.GreetRequest()
-
-        const greeting = new greets.Greeting();// //created actual greeting object as specified in schema
-        greeting.setFirstName("Anuj"); // //setting field value
-        greeting.setLastName("Jha"); 
-
-        greetRequest.setGreeting(greeting); // // set Greeting
-  
-  greetResponse
-      dynamic way
-        const greetResponse = {result: `hello ${call.request.greeting.firstName} ${call.request.greeting.lastName}`}
-      static way
-        const greets = require('../server/protos/greet_pb');
-
-        const greetResponse = new greets.GreetResponse();
-        greetResponse.setResult(`Hello ${call.request.getGreeting().getFirstName()} ${call.request.getGreeting().getLastName()}`);
+npm r grpc
+npm i @grpc/proto-loader @grpc/grpc-js
+use grpc-js instead of deprecated grpc 
+ref: https://grpc.io/blog/grpc-js-1.0/

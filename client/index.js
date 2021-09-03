@@ -1,59 +1,24 @@
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 
-const PROTO_PATH = require('path').join(__dirname, '..', 'protos', 'greet.proto');
-const greetProtoDefination = protoLoader.loadSync(PROTO_PATH, {});
-const greetPackageDefination = grpc.loadPackageDefinition(greetProtoDefination).greet; 
+const PROTO_PATH = require('path').join(__dirname, '..', 'protos', 'calculator.proto');
+const calculatorProtoDefination = protoLoader.loadSync(PROTO_PATH, {});
+
+const calculatorPackageDefination = grpc.loadPackageDefinition(calculatorProtoDefination).calculator; 
   
-const client = new greetPackageDefination.GreetService('localhost:4000', grpc.credentials.createInsecure());
+const client = new calculatorPackageDefination.CalculatorService('localhost:4000', grpc.credentials.createInsecure());
 
-function callGreet(){
-    const greetRequest = { greeting: {firstName: "Anuj", lastName: "Jha"}}
-    client.greet(greetRequest, (error, response)=>{
-        if (error) return console.log({error: error.details});
-        console.log({result: response.result})
-    })
-}
-
-function callGreetManyTimes() {
-    const greetManyTimesRequest = { greeting: {firstName: "Anuj", lastName: "Jha"}}
-    const call = client.greetManyTimes(greetManyTimesRequest, () => {}); // ? store function call on a variable
-
-    // ? listen to all events on that variable
-    call.on("data", (response) => {
-        console.log({ result: response.result});
-    });
-    call.on("status", (status) => {
-        console.log({status: status.details});
-    });
-    call.on("error", (error) => {
-        console.log({error: error.details});
-    });
-    call.on("end", () => console.log("server streaming ended"));
-}
-
-function callLongGreet(){
-    const call = client.longGreet({}, (error, response) => { // notice empty req {} since this requset will be ignored due to stream type, so this will be set later using call.write()
+function callComputeAverage(){
+    const call = client.computeAverage({}, (error, response)=>{
         if (error) return console.log({error: error.details});
         console.log({result: response.result})
     });
-    // TODO : wheteher server live or not client keep streaming data on client streaming api
-    // TODO : handle this.
-    let count = 0, intervalId = setInterval(()=>{
-        const longGreetRequest = { greeting: {firstName: "Anuj", lastName: "Jha"}};
-        call.write(longGreetRequest);
-        console.log('sent message : ', count + 1 )
-        if(++count > 9) {
-            clearInterval(intervalId);
-            call.end(); // we have sent all the msgs
-        }
-    }, 1000);
+    for(let num = 1; num < process.argv[2]; num ++) call.write({number: num}); // matching proto schema for req
+    call.end();
 }
 
-function main(){
-    // callGreet(); // unary api
-    // callGreetManyTimes(); // server streaming api
-    callLongGreet(); // client streaming apis
-}
+(function main(){
+    callComputeAverage();
+})()
 
-main();
+// node client/index.js 5

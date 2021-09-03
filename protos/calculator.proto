@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package calculator;
+
+message ComputeAverageRequest{
+    float number = 1;
+}
+message ComputeAverageResponse{
+    float result = 1;
+}
+
+service CalculatorService{
+    rpc computeAverage (stream ComputeAverageRequest) returns ( ComputeAverageResponse); //client streaming api
+}

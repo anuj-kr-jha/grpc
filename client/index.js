@@ -1,3 +1,4 @@
+const _ = { delay : ttl => new Promise(resolve => setTimeout(resolve, ttl)) };
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 
@@ -50,10 +51,27 @@ function callLongGreet(){
     }, 1000);
 }
 
+async function callGreetEveryone() {
+    const call = client.greetEveryone({}, (error, response) =>{
+        if (error) return console.log({error: error.details});
+        console.log({result: response.result})
+    });
+    call.on('data', response => console.log(`client :> hello ${response.result}`));
+    call.on('error', error => { console.log({ error: error.details}) });
+    call.on('status', status => { console.log({ status: status.details}) });
+    call.on('end', () => { console.log('Client End ...') });
+    for(let i = 0; i < 10; i++) { 
+        call.write({ greeting: { firstName: 'Anuj', lastName: 'Jha' }}) // mathing greetEveryoneRequest frpm proto schema
+        await _.delay(1000);
+    }
+    call.end();// client finished streaming
+  
+}
 function main(){
     // callGreet(); // unary api
-    // callGreetManyTimes(); // server streaming api
-    callLongGreet(); // client streaming apis
+    // callGreetManyTimes(); // server streaming api  
+    // callLongGreet(); // client streaming apis 
+    callGreetEveryone(); // client streaming apis
 }
 
 main();

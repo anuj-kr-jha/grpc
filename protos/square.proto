@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package square;
+
+message Dimension{
+    float length = 1;
+    float width = 2;
+}
+
+message AreaRequest{
+    Dimension dimension = 1;
+}
+message AreaResponse{
+    float result = 1;
+}
+
+message PerimeterRequest{
+    Dimension dimension = 1;
+}
+message PerimeterResponse{
+    float result = 1;
+}
+
+service SquareService{
+    // unary api
+    rpc area (AreaRequest) returns (AreaResponse);
+    rpc perimeter (PerimeterRequest) returns (PerimeterResponse);
+}

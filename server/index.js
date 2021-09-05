@@ -11,13 +11,11 @@ function area(call, callback){
     code: grpc.status.INVALID_ARGUMENT,
     message:  `invalid request argument`
   });
-  // * NOTE : We just handle error above that will prevent or grpc server from crash in case of invalid args.
-
   const length = call.request.dimension.length;
   const width = call.request.dimension.width;
+  const areaResponse = { result: length * width };
   callback(null, areaResponse);
 } 
-
 function perimeter(call, callback){
   if(!call.request.dimension) return callback({
     code: grpc.status.INVALID_ARGUMENT,
@@ -25,7 +23,7 @@ function perimeter(call, callback){
   });
   const length = call.request.dimension.length;
   const width = call.request.dimension.width;
-  const perimeterResponse = { result: 2 * ( length + width ) }
+  const perimeterResponse = { result: 2 * ( length + width ) };
   callback(null, perimeterResponse);
 } 
 

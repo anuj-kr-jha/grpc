@@ -1,12 +1,25 @@
+const fs = require('fs');
+const path = require('path');
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 
-const PROTO_PATH = require('path').join(__dirname, '..', 'protos', 'square.proto');
-const squareProtoDefination = protoLoader.loadSync(PROTO_PATH, {});
+const PROTO_PATH = path.join(__dirname, '..', 'protos', 'square.proto');
+const ROOT_CERT_PATH = path.join(__dirname, '..', 'certs', 'ca.crt');
+const PRIVATE_KEY_PATH = path.join(__dirname, '..', 'certs', 'client.key');
+const CERT_CHAIN_PATH = path.join(__dirname, '..', 'certs', 'client.crt');
 
+// ? grpc.credentials.createSsl(rootCerts?: Buffer, privateKey?: Buffer, certChain?: Buffer, verifyOptions?: VerifyOptions)
+let credentials = grpc.credentials.createSsl(
+    fs.readFileSync(ROOT_CERT_PATH),
+    fs.readFileSync(PRIVATE_KEY_PATH),
+    fs.readFileSync(CERT_CHAIN_PATH)
+);
+let unsafCreds = grpc.credentials.createInsecure();
+
+const squareProtoDefination = protoLoader.loadSync(PROTO_PATH, {});
 const squarePackageDefination = grpc.loadPackageDefinition(squareProtoDefination).square; 
   
-const client = new squarePackageDefination.SquareService('localhost:4000', grpc.credentials.createInsecure());
+const client = new squarePackageDefination.SquareService('localhost:4000', unsafCreds); // or pass unsafCreds for unsecure way
 
 function getGrpcDeadline(miliSec){
     if(typeof miliSec != "number" || miliSec < 0){

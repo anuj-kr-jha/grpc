@@ -1,9 +1,0 @@
-mkdir client proto server
-npm init -y
-
-proto >  primeNumberDecomposition.proto
-
-npm r grpc
-npm i @grpc/proto-loader @grpc/grpc-js
-use grpc-js instead of deprecated grpc 
-ref: https://grpc.io/blog/grpc-js-1.0/

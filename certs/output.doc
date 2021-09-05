@@ -1,0 +1,23 @@
+on root project folder:
+$ sh ./scripts/gen_cert.sh 
+Generating certificates ...
+Generating RSA private key, 4096 bit long modulus (2 primes)
+..............................................................................................................................................................................................................................................++++
+..................................++++
+e is 65537 (0x010001)
+Generating RSA private key, 4096 bit long modulus (2 primes)
+........................++++
+..............................................................++++
+e is 65537 (0x010001)
+Signature ok
+subject=C = US, ST = WA, L = Seattle, O = Test, OU = Server, CN = localhost
+Getting CA Private Key
+writing RSA key
+Generating RSA private key, 4096 bit long modulus (2 primes)
+....................................................................................................................................................................................................................................................................................++++
+.................................................................................++++
+e is 65537 (0x010001)
+Signature ok
+subject=C = US, ST = WA, L = Seattle, O = Test, OU = Client, CN = localhost
+Getting CA Private Key
+writing RSA key
